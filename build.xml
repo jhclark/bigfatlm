@@ -60,7 +60,7 @@
 	</target>
 
 	<target name="compile" depends="init,resolve">
-		<javac compiler="javac1.5" srcdir="${src}" destdir="${build}" classpath="../jannopts/bin" classpathref="lib.path.id" debug="on" encoding="utf8" />
+		<javac compiler="javac1.5" srcdir="${src}" destdir="${build}" classpath="lib/jannopts.jar" classpathref="lib.path.id" debug="on" encoding="utf8" />
 	</target>
 	
 	
@@ -88,8 +88,7 @@
 
 			<!-- Bundle all required classes in jar -->
 			<zipgroupfileset dir="${ivy.lib.dir}" includes="*.jar" excludes="junit*.jar,ant*.jar,findbugs*.jar,bcel*.jar,asm*.jar" />
-			
-			<fileset dir="../jannopts/bin" />
+			<zipfileset src="lib/jannopts.jar"/>
 
 			<manifest>
 				<attribute name="Main-Class" value="bigfat.BigFatLM" />
