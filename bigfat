@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -e
+set -o pipefail
+
+scriptDir=$(dirname $0)
+
+# Runs a BigFatLM task
+# Does not string tasks together in any particular order
+
+if [[ $# == 0 ]]; then
+    java -jar $scriptDir/bigfat.jar
+fi
+
+set -x
+
+subtask=$1
+shift
+otherArgs="$@"
+
+# Assume task is subtask unless otherwise
+task=$subtask
+
+if which hadoop; then
+    haveHadoop=1
+    numTasks=400
+else
+    haveHadoop=""
+    numTasks=1
+fi
+
+# 1) Prepare the hadoop invocation line
+case "$subtask" in
+    # applies to interpOrders and interpModels
+     interp*)
+     numTasks=$(($numTasks/4))
+     if (( $numTasks < 1 )); then
+	 numTasks=1
+     fi
+     # MAPREDUCE-478 - Separate map/reduce jvm opts
+     run="hadoop jar bigfat.jar \
+       -Dmapred.job.map.memory.mb=3584 \
+       -Dmapred.job.queue.name=m45 \
+       -Dmapred.map.tasks=$numTasks \
+       -Dmapred.reduce.tasks=$numTasks \
+       -Dmapred.map.tasks.speculative.execution=True \
+       -Dmapred.reduce.tasks.speculative.execution=True \
+       -Dmapred.map.child.java.opts='-Xmx3000m' \
+       -Dmapred.reduce.child.java.opts='-Xmx1500m'"
+     otherArgs="$otherArgs --numReducers $numTasks"
+       ;;
+
+    *)
+	run="hadoop jar $scriptDir/bigfat.jar \
+         -Dmapred.job.map.memory.mb=3584 \
+         -Dmapred.job.queue.name=m45 \
+         -Dmapred.map.tasks=$numTasks \
+         -Dmapred.reduce.tasks=$numTasks \
+         -Dmapred.map.tasks.speculative.execution=True \
+         -Dmapred.reduce.tasks.speculative.execution=True \
+         -Dmapred.map.child.java.opts='-Xmx3000m' \
+         -Dmapred.reduce.child.java.opts='-Xmx1500m'"
+	;;
+esac
+
+# Check if we're running locally
+if [ ! $haveHadoop ]; then
+    run="java -jar $scriptDir/bigfat.jar"
+fi
+
+# 2) Run the command
+case "$task" in
+    filterForPP)
+	# We can use a very strict phrase constraint
+	# when filtering for perplexity
+	# Each sentence is treated as one big "phrase"
+	#
+	# otherArgs should contain "inFile outFile"
+	$scriptDir/filter-lm.sh $otherArgs phrase
+	;;
+    filter)
+	$scriptDir/filter-lm.sh $otherArgs
+	;;
+    *)
+	# TODO: How do we pass args here...
+	# otherArgs should contain "inFile outFile"
+	eval "$run $task $otherArgs"
+	;;
+esac
