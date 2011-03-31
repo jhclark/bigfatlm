@@ -1,1 +1,70 @@
-Hadoop MapReduce training of modified Kneser-Ney language models.
+BigFatLM V0.1
+By Jonathan Clark
+Carnegie-Mellon University -- School of Computer Science -- Language Technologies Institute
+Released: March 31, 2011
+"Embiggen your language models"
+
+
+BACKGROUND
+
+Provides Hadoop MapReduce training of state-of-the-art large-scale language models.
+This allows building much larger models with commodity hardware. Other popular
+packages either have memory usage on the order of the number of N-gram types
+for the highest N (e.g. SRILM) or offer only approximate smoothing methods for
+training that offer no theoretical guarantees as the number of nodes scales up
+(e.g. IRSTLM). BigFatLM offers lower per-node memory usage on the order of the
+vocabulary size and scales well as the data size increases by making use of
+more nodes in a Hadoop cluster.
+
+Modified Kneser-Ney with order-wise interpolation has become an accepted standard
+of language model smoothing in the machine translation community (and likely has
+comparably good performance on other tasks such as speech recognition). System builders
+have also found that interpolating multiple models built on different corpora can often
+provide benefits in terms of perplexity and end-task performance. BigFatLM supports
+using both of these techniques with distributed training.**
+
+(** MODEL INTERPOLATION IS STILL UNDER TESTING AND WILL NOT BE DOCUMENTED HERE UNTIL TESTED **)
+
+For the sake of comparison, BigFatLM's results have been diffed with the output of
+SRILM's ngram-count -kndiscount -gt3min 1 -gt4min 1 -gt5min 1 -order 5 -interpolate -kndiscount -unk
+and found to be within floating point error.
+
+
+REQUIREMENTS
+
+* Java 6+
+* A Hadoop cluster running Hadoop 20.1+ or, for much slower results, a local install of Hadoop.
+* If you wish to build BigFatLM from source, you'll need the Apache Ant build system
+* If you wish to filter the language model, you should also install KenLM's filter tool.
+See http://kheafield.com/code/mt/filter.html.
+* If you wish to run the regression tests, you'll need Python 2.6+
+
+BUILDING
+
+Just type "ant"
+
+
+USAGE
+
+Assume we have:
+* A pre-processed, tokenized corpus on HDFS (the Hadoop distributed filesystem) 
+  at /home/user/corpus
+And we want to build:
+* An order 3 LM
+* Use order-wise interpolated modified Kneser-Ney smoothing (default)
+And we want to put the resulting files:
+* For the small local files, under ./corpus-3g-lm
+* For the large HDFS files, under $HDFS_USER_HOME/corpus-3g-lm
+* For the final local merged ARPA file, at /home/user/corpus-3g.arpa
+
+# The most basic usage, to get an uncompressed ARPA file:
+$ ./build-lm.sh 3 /home/user/corpus corpus-3g-lm /home/user/corpus-3g.arpa
+
+# To gzip the resulting ARPA file using bash process substitution:
+$ ./build-lm.sh 3 /home/user/corpus corpus-3g-lm >(gzip > /home/user/corpus-3g.arpa.gz)
+
+
+REFERENCES
+
+1. Chen, Stanley; Goodman J. An Empirical Study of Smoothing Techniques for Language Modeling.; 1998.
+2. Brants T, Popat AC, Och FJ. Large Language Models in Machine Translation. Computational Linguistics. 2007;1(June):858-867.
