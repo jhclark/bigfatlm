@@ -1,0 +1,16 @@
+<ivy-module version="2.0">
+    <info organisation="sourceforge" module="BigFatLM"/>
+    <dependencies>
+        <dependency org="com.google.guava" name="guava" rev="r06"/>
+        
+        <!-- Hadoop and its dependencies (which should have been referenced in hadoop-core) -->
+		<dependency org="org.apache.mahout.hadoop" name="hadoop-core" rev="0.20.1"/>
+		<dependency org="commons-logging" name="commons-logging" rev="1.1.1"/>
+		<dependency org="commons-cli" name="commons-cli" rev="1.2"/>
+		<dependency org="commons-httpclient" name="commons-httpclient" rev="3.1"/>
+		<dependency org="junit" name="junit" rev="4.8.1"/>
+		
+		<!-- from springs repo... -->
+		<dependency org="com.jetbrains.trove4j" name="com.springsource.gnu.trove" rev="7.0.2" />
+    </dependencies>
+</ivy-module>

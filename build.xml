@@ -1,0 +1,111 @@
+<project name="BigFatLM" default="jar" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+
+	<property name="src" value="./src" />
+	<property name="test" value="./test" />
+	<property name="build" value="./bin" />
+	<property name="jarFile" value="bigfat.jar" />
+	
+	<property name="ivy.install.version" value="2.1.0" />
+	<property name="ivy.jar.dir" value="${basedir}/ivy" />
+	<property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+	<property name="ivy.lib.dir" value="${basedir}/ivy/resolved-libs" />
+	<path id="lib.path.id">
+		<fileset dir="${ivy.lib.dir}" />
+	</path>
+	
+	<available file="${ivy.jar.file}" property="skip.download" />
+	<target name="download-ivy" unless="skip.download">
+			<mkdir dir="${ivy.jar.dir}" />
+			<!-- download Ivy from web site so that it can be used even without any special installation -->
+			<echo message="installing ivy..." />
+			<get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" dest="${ivy.jar.file}" usetimestamp="true" />
+		</target>
+
+	<!-- =================================
+	target: install-ivy
+	this target is not necessary if you put ivy.jar in your ant lib directory
+	if you already have ivy in your ant lib, you can simply remove this
+	target and the dependency the 'go' target has on it
+	================================= -->
+	<target name="install-ivy" depends="download-ivy" description="--> install ivy">
+		<!-- try to load ivy here from local ivy dir, in case the user has not already dropped
+	it into ant's lib dir (note that the latter copy will always take precedence).
+	We will not fail as long as local lib dir exists (it may be empty) and
+	ivy is in at least one of ant's lib dir or the local lib dir. -->
+		<path id="ivy.lib.path">
+			<fileset dir="${ivy.jar.dir}" includes="*.jar" />
+		</path>
+		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
+	</target>
+	
+
+	<!-- Use ivy to retrieve dependencies
+		 see http://ant.apache.org/ivy/history/trunk/ant.html for more info
+		 
+		 IvyDE is also used to resolve dependencies in Eclipse.
+		 See http://ant.apache.org/ivy/ivyde/history/latest-milestone/cpc/create.html
+	-->
+	<target name="resolve" depends="install-ivy">
+		<ivy:retrieve />
+		
+		<!--
+		<get dest="lib/autojar.zip"
+			src="http://downloads.sourceforge.net/project/autojar/autojar/2.0.1/autojar-2.0.1.zip"/>
+			-->
+	</target>
+	
+	<target name="init">
+		<tstamp />
+		<mkdir dir="${build}" />
+	</target>
+
+	<target name="compile" depends="init,resolve">
+		<javac compiler="javac1.5" srcdir="${src}" destdir="${build}" classpath="../jannopts/bin" classpathref="lib.path.id" debug="on" encoding="utf8" />
+	</target>
+	
+	
+	<target name="jar" depends="compile">
+
+<!--		
+		 <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
+		        classpath="lib/jarjar-1.0.jar"/>
+		
+		    <jarjar jarfile="${jarFile}">
+		        <fileset dir="${build}"  includes="**/*.class **/*.xml **/*.properties" />
+		    	
+		    	<zipgroupfileset dir="${ivy.lib.dir}" includes="*.jar" excludes="junit*.jar,ant*.jar,findbugs*.jar,bcel*.jar,asm*.jar" />
+		    	<keep pattern="bigfat.**"/>
+		    	<zap pattern="**.txt"/>
+		    	<manifest>
+					<attribute name="Main-Class" value="bigfat.BigFatLM" />
+				</manifest>
+		    </jarjar>
+		-->
+
+
+		<jar destfile="${jarFile}">
+			<fileset dir="${build}" includes="**/*.class **/*.xml **/*.properties" />
+
+			<!-- Bundle all required classes in jar -->
+			<zipgroupfileset dir="${ivy.lib.dir}" includes="*.jar" excludes="junit*.jar,ant*.jar,findbugs*.jar,bcel*.jar,asm*.jar" />
+			
+			<fileset dir="../jannopts/bin" />
+
+			<manifest>
+				<attribute name="Main-Class" value="bigfat.BigFatLM" />
+			</manifest>
+		</jar>
+
+		<echo message="BigLM JAR has been built" />
+	</target>
+
+	<target name="test" depends="jar">
+	  <exec dir="." executable="bash">
+	    <arg line="test.sh"/>
+	  </exec>
+	  <exec dir="." executable="python">
+	    <arg line="lm-diff.py testOut/lm.arpa srilm.arpa.sorted" />
+	  </exec>
+	  </target>
+	
+</project>
