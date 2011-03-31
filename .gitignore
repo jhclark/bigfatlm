@@ -1,0 +1,8 @@
+.svn
+#*#
+*.log
+*.out
+*.aux
+*~
+bin
+ivy
