@@ -11,6 +11,6 @@
 		<dependency org="junit" name="junit" rev="4.8.1"/>
 		
 		<!-- from springs repo... -->
-		<dependency org="com.jetbrains.trove4j" name="com.springsource.gnu.trove" rev="7.0.2" />
+		<dependency org="trove" name="trove" rev="1.0.2" />
     </dependencies>
 </ivy-module>
