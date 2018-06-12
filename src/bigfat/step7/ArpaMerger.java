@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
-import java.util.zip.GZIPInputStream;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -24,6 +23,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.compress.BZip2Codec;
 
 import bigfat.BigFatLM;
+import bigfat.util.MultiMemberGZIPInputStream;
 import bigfat.BigFatLM.CompressionType;
 import bigfat.util.StringUtils;
 import bigfat.util.UncheckedLineIterable.UncheckedLineIterator;
@@ -118,7 +118,7 @@ public class ArpaMerger {
 			FSDataInputStream is = fs.open(stat.getPath());
 			InputStream compressedInputStream;
 			if(compression == CompressionType.GZIP) {
-				compressedInputStream = new GZIPInputStream(is);
+				compressedInputStream = new MultiMemberGZIPInputStream(is);
 			} else if(compression == CompressionType.BZIP) {
 				compressedInputStream = new BZip2Codec().createInputStream(is);
 			} else {

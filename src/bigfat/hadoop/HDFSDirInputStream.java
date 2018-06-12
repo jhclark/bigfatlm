@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,6 +17,8 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+
+import bigfat.util.MultiMemberGZIPInputStream;
 
 /**
  * This file is taken from the Chaski project under the Apache license.
@@ -33,7 +34,7 @@ public class HDFSDirInputStream extends PipeInputStream {
 		try {
 			FSDataInputStream stream = fs.open(new Path(file));
 			if (file.endsWith(".gz")) {
-				return new GZIPInputStream(stream);
+				return new MultiMemberGZIPInputStream(stream);
 			} else {
 				return stream;
 			}

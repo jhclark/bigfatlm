@@ -39,7 +39,7 @@ case "$subtask" in
      # MAPREDUCE-478 - Separate map/reduce jvm opts
      run="hadoop jar bigfat.jar \
        -Dmapred.job.map.memory.mb=3584 \
-       -Dmapred.job.queue.name=m45 \
+       -Dmapred.job.queue.name=default \
        -Dmapred.map.tasks=$numTasks \
        -Dmapred.reduce.tasks=$numTasks \
        -Dmapred.map.tasks.speculative.execution=True \
@@ -52,7 +52,7 @@ case "$subtask" in
     *)
 	run="hadoop jar $scriptDir/bigfat.jar \
          -Dmapred.job.map.memory.mb=3584 \
-         -Dmapred.job.queue.name=m45 \
+         -Dmapred.job.queue.name=default \
          -Dmapred.map.tasks=$numTasks \
          -Dmapred.reduce.tasks=$numTasks \
          -Dmapred.map.tasks.speculative.execution=True \

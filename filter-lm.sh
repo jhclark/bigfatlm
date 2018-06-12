@@ -63,8 +63,8 @@ EOF
 )>$localTmpDir/filter-mapper.sh
 
 
-    frun="hadoop jar $HADOOP_HOME/hadoop-streaming.jar \
-    -Dmapred.job.queue.name=m45 \
+    frun="hadoop jar $HADOOP_HOME/share/hadoop/tools/lib/hadoop-streaming.jar \
+    -Dmapred.job.queue.name=default \
     -Dmapred.map.tasks=$numTasks \
     -Dmapred.reduce.tasks=$numTasks \
     -Dmapred.map.tasks.speculative.execution=True \

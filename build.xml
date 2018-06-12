@@ -60,7 +60,7 @@
 	</target>
 
 	<target name="compile" depends="init,resolve">
-		<javac compiler="javac1.5" srcdir="${src}" destdir="${build}" classpath="lib/jannopts.jar" classpathref="lib.path.id" debug="on" encoding="utf8" />
+		<javac includeantruntime="false" compiler="javac1.8" srcdir="${src}" destdir="${build}" classpath="lib/jannopts.jar" classpathref="lib.path.id" debug="on" encoding="utf8" />
 	</target>
 	
 	

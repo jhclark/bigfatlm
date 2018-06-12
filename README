@@ -1,7 +1,7 @@
 BigFatLM V0.1
 By Jonathan Clark
 Carnegie-Mellon University -- School of Computer Science -- Language Technologies Institute
-Released: March 31, 2011
+Released: May 24, 2018
 Liscence: LGPL 3.0
 "Embiggen your language models"
 
@@ -34,7 +34,7 @@ and found to be within floating point error.
 REQUIREMENTS
 
 * Java 6+
-* A Hadoop cluster running Hadoop 20.1+ or, for much slower results, a local install of Hadoop.
+* A Hadoop cluster running Hadoop 2.8.3+ or, for much slower results, a local install of Hadoop.
 * If you wish to build BigFatLM from source, you'll need the Apache Ant build system
 * If you wish to filter the language model, you should also install KenLM's filter tool.
 See http://kheafield.com/code/mt/filter.html.
